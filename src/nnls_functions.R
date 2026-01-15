@@ -1,16 +1,16 @@
-run_nnls_merge = function(alt_ratio, val_data_three_breeds_matrix_numeric){
+run_nnls_merge = function(alt_ratio, ref_breed_matrix){
   library(nnls)
   alt_ratio = alt_ratio[!is.na(alt_ratio)]
-  alt_ratio_entire = rep(mean(alt_ratio),nrow(val_data_three_breeds_matrix_numeric))
-  names(alt_ratio_entire) = rownames(val_data_three_breeds_matrix_numeric)
-  intersect_snp = intersect(rownames(val_data_three_breeds_matrix_numeric),names(alt_ratio))
+  alt_ratio_entire = rep(mean(alt_ratio),nrow(ref_breed_matrix))
+  names(alt_ratio_entire) = rownames(ref_breed_matrix)
+  intersect_snp = intersect(rownames(ref_breed_matrix),names(alt_ratio))
   alt_ratio_entire[intersect_snp] = alt_ratio[intersect_snp]
   
-  val_data_three_breeds_matrix_numeric_intersect = val_data_three_breeds_matrix_numeric[intersect_snp,]
+  ref_breed_matrix_intersect = ref_breed_matrix[intersect_snp,]
   alt_ratio_intersect = alt_ratio[intersect_snp]
   
-  nnls_result_intersect = nnls(rbind(val_data_three_breeds_matrix_numeric_intersect,
-                                     rep(length(alt_ratio_intersect),3)),
+  nnls_result_intersect = nnls(rbind(ref_breed_matrix_intersect,
+                                     rep(length(alt_ratio_intersect),ncol(ref_breed_matrix))),
                                c(alt_ratio_intersect, 
                                  length(alt_ratio_intersect)))
   
@@ -19,7 +19,7 @@ run_nnls_merge = function(alt_ratio, val_data_three_breeds_matrix_numeric){
   nnls_result_list[['AltRatioFilled']] = alt_ratio_entire
   nnls_result_list[['IntersectSNP']] = intersect_snp
   
-  cor_intersect = cor(val_data_three_breeds_matrix_numeric_intersect, alt_ratio_intersect)
+  cor_intersect = cor(ref_breed_matrix_intersect, alt_ratio_intersect)
   nnls_result_list[['cor_intersect']] = cor_intersect
   
   return(nnls_result_list)
